@@ -1,9 +1,9 @@
-(function() {
+javascript:(function() {
     function identifySite() {
-        if (window.location.hostname.indexOf('imdb') !== -1) return 'imdb';
-        if (window.location.hostname.indexOf('letterboxd') !== -1) return 'letterboxd';
-        if (window.location.hostname.indexOf('google') !== -1) return 'google';
-        if (window.location.hostname.indexOf('trakt') !== -1) return 'trakt';
+			if (window.location.hostname.includes('google')) return 'google';
+        if (window.location.hostname.includes('imdb')) return 'imdb';
+        if (window.location.hostname.includes('letterboxd')) return 'letterboxd';
+        if (window.location.hostname.includes('trakt')) return 'trakt';
     }
 
     function collectInfo() {
@@ -13,13 +13,18 @@
             return { host, imdb, mediaType: 'movie' };
         } else if (host === 'letterboxd') {
             let splitLink = document.querySelector('a.micro-button[data-track-action="IMDb"]').getAttribute('href').split('/')
-            return splitLink[splitLink.length-2];
+						let imdb;
+						for (let i = 0; i < splitLink.length; i++) {
+							if (splitLink[i].includes('tt')) imdb = splitLink[i];
+						}
+						return { host, imdb, mediaType: 'movie' };
         } else if (host === 'google') {
             let IMDBLink = document.querySelector('[title="IMDb"]').parentElement.getAttribute('href');
-            return 'tt' + IMDBLink.split('/tt')[1].split('/')[0];
+						let imdb = 'tt' + IMDBLink.split('/tt')[1].split('/')[0];
+						return { host, imdb, mediaType: 'movie' }
         } else if (host === 'trakt') {
-            const isShow = window.location.pathname.indexOf('seasons') === -1;
-            const isEpisode = window.location.pathname.indexOf('episodes') !== -1;
+            const isShow = !window.location.pathname.includes('seasons');
+            const isEpisode = window.location.pathname.includes('episodes');
             const isSeason = !isShow && !isEpisode;
             console.log(isShow, isEpisode, isSeason);
             if (isShow || isSeason) {
