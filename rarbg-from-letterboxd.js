@@ -12,12 +12,9 @@ javascript:(function() {
             const imdb = 'tt' + window.location.href.split('/tt')[1].split('/')[0];
             return { host, imdb, mediaType: 'movie' };
         } else if (host === 'letterboxd') {
-            let splitLink = document.querySelector('a.micro-button[data-track-action="IMDb"]').getAttribute('href').split('/')
-						let imdb;
-						for (let i = 0; i < splitLink.length; i++) {
-							if (splitLink[i].includes('tt')) imdb = splitLink[i];
-						}
-						return { host, imdb, mediaType: 'movie' };
+            const splitLink = document.querySelector('a.micro-button[data-track-action="IMDb"]').getAttribute('href').split('/');
+						const imdb = splitLink[splitLink.length-2];
+            return { host, imdb, mediaType: 'movie' }
         } else if (host === 'google') {
             let IMDBLink = document.querySelector('[title="IMDb"]').parentElement.getAttribute('href');
 						let imdb = 'tt' + IMDBLink.split('/tt')[1].split('/')[0];
@@ -26,16 +23,13 @@ javascript:(function() {
             const isShow = !window.location.pathname.includes('seasons');
             const isEpisode = window.location.pathname.includes('episodes');
             const isSeason = !isShow && !isEpisode;
-            console.log(isShow, isEpisode, isSeason);
             if (isShow || isSeason) {
                 const links = document.querySelectorAll('ul.external li a');
                 for (let i = 0; i < links.length; i++) {
                     const link = links[i];
                     if (link.innerHTML === 'IMDB') {
-                        console.log('yes')
                         let IMDBLink = link.getAttribute('href');
                         let imdb = 'tt' + IMDBLink.split('/tt')[1].split('/')[0];
-                        console.log({ host, imdb, mediaType: 'show' });
                         return { host, imdb, mediaType: 'show' };
                     }
                 }
@@ -51,13 +45,13 @@ javascript:(function() {
     }
 
     const info = collectInfo();
-    console.log(info);
+    console.log('info', info);
     openTab(info);
 
     function openTab(info) {
         if (info.mediaType === 'movie') {
             const rarbgLink = 'https://rarbgproxy.org/torrents.php?category=14;48;17;44;45;47;50;51;52;42;46&search={IMDB_ID}&order=seeders&by=DESC';
-            window.open(rarbgLink.replace('{IMDB_ID}', info.imdb), '_blank');
+						window.open(rarbgLink.replace('{IMDB_ID}', info.imdb), '_blank');
         } else if (info.mediaType === 'show') {
             window.open(`https://rarbgproxy.org/tv/${info.imdb}/`);
         } else if (info.mediaType === 'episode') {
